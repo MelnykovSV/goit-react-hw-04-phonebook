@@ -1,80 +1,84 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form } from '../Form/Form';
 import { ContactsList } from '../ContactsList/Contactslist';
 import { Contact } from '../Contact/Contact';
 import { ModernNormalize } from 'emotion-modern-normalize';
 
 import { Container } from './App.styled';
-import { IContact, IState } from '../../interfaces';
+import { IContact } from '../../interfaces';
 
-// import css from './../PhoneBook.module.scss';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  ///Gets initial contacts value from local storage
+  const [contacts, setContacts] = useState(
+    localStorage.getItem('contacts')
+      ? JSON.parse(localStorage.getItem('contacts')!)
+      : []
+  );
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const storedContacts: string | null = localStorage.getItem('contacts');
+  /// Saves contacts to local storage on its change
 
-    if (storedContacts) {
-      this.setState({ contacts: JSON.parse(storedContacts) });
-    }
-  }
-  componentDidUpdate() {
-    localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-  }
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  formSubmitHandler = (data: IContact): void => {
-    const copy: IState = this.state;
+  ///Saves contact to contacts if there is no contact with such name
+  const formSubmitHandler = (data: IContact): boolean => {
     const normalizedName = data.name.toLowerCase();
     if (
-      !copy.contacts.some(item => item.name.toLowerCase() === normalizedName)
+      !contacts.some(
+        (item: IContact) => item.name.toLowerCase() === normalizedName
+      )
     ) {
-      this.setState({ contacts: [data, ...copy.contacts] });
+      setContacts([data, ...contacts]);
+      return true;
     } else {
-      alert(`${data.name} is already in contacts.`);
+      notify(`${data.name} is already in contacts.`);
+      return false;
     }
   };
-
-  contactDeleteHandler = (id: string): void => {
-    const data = this.state;
-    const result = data.contacts.filter((item: IContact): boolean => {
-      return item.id !== id;
-    });
-    this.setState({ contacts: result });
-  };
-  contactsFilter = (value: string): void => {
-    this.setState({ filter: value });
-  };
-
-  render() {
-    const normalizedFilter = this.state.filter.toLowerCase();
-    const filteredContacts = this.state.contacts.filter(
-      (item: IContact): boolean => {
-        return item.name.toLowerCase().includes(normalizedFilter);
-      }
-    );
-    return (
-      <Container>
-        <ModernNormalize />
-        <h2>Phonebook</h2>
-
-        <Form formSubmit={this.formSubmitHandler}></Form>
-        <ContactsList contactsFilter={this.contactsFilter}>
-          {filteredContacts.map((item: IContact) => (
-            <Contact
-              name={item.name}
-              number={item.number}
-              id={item.id}
-              key={item.id}
-              deleteHandler={this.contactDeleteHandler}
-            />
-          ))}
-        </ContactsList>
-      </Container>
-    );
+  function notify(message: string) {
+    toast(message);
   }
-}
+
+  ///Deletes contact
+  const contactDeleteHandler = (id: string): void => {
+    const contactsAfterElementRemoval = [...contacts].filter(
+      (item: IContact): boolean => item.id !== id
+    );
+    setContacts(contactsAfterElementRemoval);
+  };
+
+  /// Sets contacts filter
+  const contactsFilter = (value: string): void => {
+    setFilter(value.toLowerCase());
+  };
+
+  const filteredContacts = contacts.filter((item: IContact): boolean => {
+    return item.name.toLowerCase().includes(filter);
+  });
+
+  return (
+    <Container>
+      <ModernNormalize />
+      <h2>Phonebook</h2>
+
+      <Form formSubmit={formSubmitHandler}></Form>
+      <ContactsList contactsFilter={contactsFilter}>
+        {filteredContacts.map((item: IContact) => (
+          <Contact
+            name={item.name}
+            number={item.number}
+            id={item.id}
+            key={item.id}
+            deleteHandler={contactDeleteHandler}
+          />
+        ))}
+      </ContactsList>
+      <ToastContainer />
+    </Container>
+  );
+};

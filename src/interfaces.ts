@@ -21,7 +21,7 @@ export interface IContactsListProps {
 }
 
 export interface IFormProps {
-  formSubmit: (data: IContact) => void;
+  formSubmit: (data: IContact) => boolean;
 }
 
 export interface IContact {

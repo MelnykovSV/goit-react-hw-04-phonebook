@@ -1,12 +1,18 @@
-import { Component } from 'react';
+import React from 'react';
 import { Container } from './Form.styled';
-import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
+import {
+  Formik,
+  Form as FormikForm,
+  Field,
+  ErrorMessage,
+  FormikHelpers,
+} from 'formik';
 import * as yup from 'yup';
 import { IFormProps } from '../../interfaces';
 import shortid from 'shortid';
 
-export class Form extends Component<IFormProps> {
-  schema = yup.object().shape({
+export const Form = ({ formSubmit }: IFormProps) => {
+  const schema = yup.object().shape({
     name: yup
       .string()
       .min(6, 'Minimum input length 6 symbols')
@@ -26,53 +32,62 @@ export class Form extends Component<IFormProps> {
       .required('This field is required'),
   });
 
-  submitHandler = async (values: {
-    name: string;
-    number: string;
-  }): Promise<void> => {
-    console.log(values);
-    const isValid = await this.schema.isValid(values);
+  async function submitHandler(
+    values: {
+      name: string;
+      number: string;
+    },
+    {
+      resetForm,
+    }: FormikHelpers<{
+      name: string;
+      number: string;
+    }>
+  ): Promise<void> {
+    const isValid = await schema.isValid(values);
 
     if (isValid) {
       const result = { ...values, id: shortid.generate() };
 
-      this.props.formSubmit(result);
+      const isContactAdded = formSubmit(result);
+      console.log(isContactAdded);
+      if (isContactAdded) {
+        resetForm();
+      }
     }
-  };
-
-  render() {
-    return (
-      <Container>
-        <Formik
-          initialValues={{ name: '', number: '' }}
-          onSubmit={this.submitHandler}
-          validationSchema={this.schema}
-        >
-          <FormikForm>
-            <label>
-              Name
-              <Field type="text" name="name" placeholder="Name your contact" />
-              <span>
-                <ErrorMessage name="name" />
-              </span>
-            </label>
-
-            <label>
-              Number
-              <Field
-                type="tel"
-                name="number"
-                placeholder="Paste or type the number"
-              />
-              <span>
-                <ErrorMessage name="number" />
-              </span>
-            </label>
-
-            <button type="submit">Add contact</button>
-          </FormikForm>
-        </Formik>
-      </Container>
-    );
   }
-}
+
+  return (
+    <Container>
+      <Formik
+        initialValues={{ name: '', number: '' }}
+        onSubmit={submitHandler}
+        validationSchema={schema}
+      >
+        <FormikForm>
+          <label>
+            Name
+            <Field type="text" name="name" placeholder="Name your contact" />
+            <span>
+              <ErrorMessage name="name" />
+            </span>
+          </label>
+
+          <label>
+            Number
+            <Field
+              type="tel"
+              name="number"
+              placeholder="Paste or type the number"
+            />
+            <span>
+              <ErrorMessage name="number" />
+            </span>
+          </label>
+
+          <button type="submit">Add contact</button>
+        </FormikForm>
+      </Formik>
+    </Container>
+  );
+};

@@ -10,9 +10,16 @@ export const Container = styled.li`
   justify-content: space-between;
   align-items: center;
   transition: background-color ${animations.time} ${animations.cubic};
-  p {
-    margin: 0;
+  div {
+    max-width: 80%;
+
+    p {
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
+
   button {
     width: 43px;
     height: 43px;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, StyledSearchIcon } from './Contactslist.styled';
 
 import { IContactsListProps } from '../../interfaces';
-const shortid = require('shortid');
+import shortid from 'shortid';
 
 export const ContactsList = ({
   contactsFilter,
