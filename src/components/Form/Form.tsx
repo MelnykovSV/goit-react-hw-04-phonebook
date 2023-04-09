@@ -50,7 +50,7 @@ export const Form = ({ formSubmit }: IFormProps) => {
       const result = { ...values, id: shortid.generate() };
 
       const isContactAdded = formSubmit(result);
-      console.log(isContactAdded);
+
       if (isContactAdded) {
         resetForm();
       }

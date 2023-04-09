@@ -22,6 +22,7 @@ export const Container = styled.div`
     gap: 10px;
     max-height: 334px;
     overflow-y: auto;
+    height: 100%;
   }
   label {
     display: block;
