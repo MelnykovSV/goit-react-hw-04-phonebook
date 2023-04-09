@@ -12,7 +12,7 @@ export const ContactsList = ({
   const searchHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
     contactsFilter(e.target.value);
   };
-  ///_______
+
   return (
     <Container>
       <h2>Contacts</h2>

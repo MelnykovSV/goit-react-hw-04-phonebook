@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from '../Form/Form';
-import { ContactsList } from '../ContactsList/ContactsList';
+import { ContactsList } from '../ContactsList/Contactslist';
 import { Contact } from '../Contact/Contact';
 import { ModernNormalize } from 'emotion-modern-normalize';
 
