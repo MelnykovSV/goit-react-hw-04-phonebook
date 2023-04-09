@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from '../Form/Form';
-import { ContactsList } from '../ContactsList/Contactslist';
+import { ContactsList } from '../ContactsList/ContactsList';
 import { Contact } from '../Contact/Contact';
 import { ModernNormalize } from 'emotion-modern-normalize';
 
@@ -33,23 +33,20 @@ export const App = () => {
         (item: IContact) => item.name.toLowerCase() === normalizedName
       )
     ) {
-      setContacts([data, ...contacts]);
+      setContacts((prevContacts: IContact[]) => [data, ...prevContacts]);
       return true;
     } else {
-      notify(`${data.name} is already in contacts.`);
+      toast(`${data.name} is already in contacts.`);
+
       return false;
     }
   };
-  function notify(message: string) {
-    toast(message);
-  }
 
   ///Deletes contact
   const contactDeleteHandler = (id: string): void => {
-    const contactsAfterElementRemoval = [...contacts].filter(
-      (item: IContact): boolean => item.id !== id
+    setContacts((prevContacts: IContact[]) =>
+      prevContacts.filter((item: IContact): boolean => item.id !== id)
     );
-    setContacts(contactsAfterElementRemoval);
   };
 
   /// Sets contacts filter
@@ -57,9 +54,9 @@ export const App = () => {
     setFilter(value.toLowerCase());
   };
 
-  const filteredContacts = contacts.filter((item: IContact): boolean => {
-    return item.name.toLowerCase().includes(filter);
-  });
+  const filteredContacts = contacts.filter((item: IContact): boolean =>
+    item.name.toLowerCase().includes(filter)
+  );
 
   return (
     <Container>
@@ -68,12 +65,12 @@ export const App = () => {
 
       <Form formSubmit={formSubmitHandler}></Form>
       <ContactsList contactsFilter={contactsFilter}>
-        {filteredContacts.map((item: IContact) => (
+        {filteredContacts.map(({ name, number, id }: IContact) => (
           <Contact
-            name={item.name}
-            number={item.number}
-            id={item.id}
-            key={item.id}
+            name={name}
+            number={number}
+            id={id}
+            key={id}
             deleteHandler={contactDeleteHandler}
           />
         ))}
